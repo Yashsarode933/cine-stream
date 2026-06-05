@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #141414;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Hide scrollbar globally */
+  body::-webkit-scrollbar {
+    display: none;
+  }
+
+  body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .font-netflix-sans {
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Scrollbar Hide Utility */
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+}
+
+/* Custom Netflix-style glassmorphism auth cards */
+.glass-card {
+  background: rgba(0, 0, 0, 0.75);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Custom gradients */
+.banner-gradient-top {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.7) 10%, transparent 100%);
+}
+
+.banner-gradient-bottom {
+  background: linear-gradient(180deg, transparent, rgba(20, 20, 20, 1));
+}
+
+.slider-mask-left {
+  background: linear-gradient(90deg, rgba(20, 20, 20, 0.9) 0%, transparent 100%);
+}
+
+.slider-mask-right {
+  background: linear-gradient(270deg, rgba(20, 20, 20, 0.9) 0%, transparent 100%);
+}
