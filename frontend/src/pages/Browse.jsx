@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import HeroBanner from '../components/content/HeroBanner';
 import ContentRow from '../components/content/ContentRow';
@@ -11,7 +12,23 @@ import {
 } from '../hooks/useTMDB';
 import { useUserActions } from '../hooks/useUserActions';
 
+// Genre data for filter chips
+const genreChips = [
+  { id: '28', name: 'Action' },
+  { id: '35', name: 'Comedy' },
+  { id: '18', name: 'Drama' },
+  { id: '878', name: 'Sci-Fi' },
+  { id: '27', name: 'Horror' },
+  { id: '9648', name: 'Mystery' },
+  { id: '10749', name: 'Romance' },
+  { id: '53', name: 'Thriller' },
+];
+
 const Browse = () => {
+  const navigate = useNavigate();
+  const [activeGenre, setActiveGenre] = useState(null);
+  const [contentType, setContentType] = useState('all'); // 'all', 'movie', 'tv'
+
   // 1. Fetch TMDB Proxy lists
   const { data: trending, isLoading: loadingTrending } = useTrendingQuery();
   const { data: popularMovies, isLoading: loadingPopular } = useMoviesQuery('popular');
@@ -58,6 +75,20 @@ const Browse = () => {
 
   const showSkeletons = loadingTrending || loadingPopular || loadingPopularTV || loadingTopRatedTV;
 
+  const handleGenreClick = (genreId) => {
+    if (activeGenre === genreId) {
+      setActiveGenre(null);
+      setContentType('all');
+    } else {
+      setActiveGenre(genreId);
+      // Navigate to genre page
+      const genre = genreChips.find(g => g.id === genreId);
+      if (genre) {
+        navigate(`/genre/movie/${genreId}`);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-brand-black pb-24 text-white overflow-x-hidden">
       {/* Navigation Header */}
@@ -65,6 +96,28 @@ const Browse = () => {
 
       {/* Hero Billboard */}
       <HeroBanner />
+
+      {/* Genre Filter Chips */}
+      <div className="relative z-30 px-6 sm:px-12 py-6">
+        <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">
+          Browse by Genre
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          {genreChips.map((genre) => (
+            <button
+              key={genre.id}
+              onClick={() => handleGenreClick(genre.id)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                activeGenre === genre.id
+                  ? 'bg-brand-red text-white shadow-lg shadow-red-900/50 scale-105'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700 hover:border-gray-500'
+              }`}
+            >
+              {genre.name}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Row Listings */}
       <div className="relative z-30 space-y-2 md:space-y-6">

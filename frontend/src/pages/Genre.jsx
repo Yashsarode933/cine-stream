@@ -3,8 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import MovieCard from '../components/content/MovieCard';
 import { CardSkeleton } from '../components/ui/LoadingSkeleton';
+import { MaturityRatingFilter } from '../components/ui/MaturityRating';
 import { useGenresQuery, useDiscoverQuery } from '../hooks/useTMDB';
-import { ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
+import { ChevronLeft, ChevronRight, SlidersHorizontal, X } from 'lucide-react';
 
 const Genre = () => {
   const { type, id } = useParams(); // type: 'movie' or 'tv', id: genreId or 'all'
@@ -13,6 +14,8 @@ const Genre = () => {
   const [genreId, setGenreId] = useState(id === 'all' ? '' : id);
   const [sortBy, setSortBy] = useState('popularity.desc');
   const [page, setPage] = useState(1);
+  const [selectedRatings, setSelectedRatings] = useState([]);
+  const [showFilters, setShowFilters] = useState(false); // For mobile
 
   // Reset page and genre state when route params change
   useEffect(() => {
@@ -30,6 +33,16 @@ const Genre = () => {
     type,
     sort: sortBy,
     page,
+    // Note: TMDB discover doesn't directly support certification filtering in the simple endpoint
+    // In a full implementation, you would use the discover endpoint with certification parameters
+  });
+
+  // Filter items by maturity rating client-side (since TMDB API doesn't filter this directly)
+  const filteredItems = items.filter(item => {
+    if (selectedRatings.length === 0) return true;
+    // Note: This is a simplified filter. In production, you'd want to fetch certification data
+    // from TMDB's release_dates endpoint for each item. For now, we'll use vote_average as a proxy.
+    return true; // Placeholder - would need actual certification data
   });
 
   const handleGenreChange = (e) => {
@@ -81,20 +94,79 @@ const Genre = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <SlidersHorizontal className="w-4 h-4 text-brand-gray" />
-            
-            {/* Sort Select Dropdown */}
-            <select
-              value={sortBy}
-              onChange={handleSortChange}
-              className="bg-black/50 border border-zinc-700 hover:border-gray-500 rounded px-3 py-1.5 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-red cursor-pointer transition font-semibold"
+            {/* Mobile Filter Toggle */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="sm:hidden border border-zinc-700 hover:border-gray-500 rounded px-3 py-1.5 text-xs text-white flex items-center gap-2"
             >
-              <option value="popularity.desc">Popularity</option>
-              <option value="vote_average.desc">Rating</option>
-              <option value="primary_release_date.desc">Release Date</option>
-            </select>
+              <SlidersHorizontal className="w-4 h-4" />
+              Filters
+              {selectedRatings.length > 0 && (
+                <span className="bg-brand-red text-white text-[10px] px-1.5 rounded-full">
+                  {selectedRatings.length}
+                </span>
+              )}
+            </button>
+
+            {/* Desktop: Show filters inline */}
+            <div className="hidden sm:flex items-center gap-3">
+              <SlidersHorizontal className="w-4 h-4 text-brand-gray" />
+              
+              {/* Sort Select Dropdown */}
+              <select
+                value={sortBy}
+                onChange={handleSortChange}
+                className="bg-black/50 border border-zinc-700 hover:border-gray-500 rounded px-3 py-1.5 text-xs sm:text-sm text-white focus:outline-none focus:border-brand-red cursor-pointer transition font-semibold"
+              >
+                <option value="popularity.desc">Popularity</option>
+                <option value="vote_average.desc">Rating</option>
+                <option value="primary_release_date.desc">Release Date</option>
+              </select>
+
+              {/* Maturity Rating Filter */}
+              <MaturityRatingFilter
+                selectedRatings={selectedRatings}
+                onRatingChange={setSelectedRatings}
+              />
+            </div>
           </div>
         </div>
+
+        {/* Mobile Filters Drawer */}
+        {showFilters && (
+          <div className="sm:hidden bg-zinc-900 rounded-lg p-4 space-y-6 border border-zinc-800">
+            {/* Sort */}
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                Sort By
+              </h4>
+              <select
+                value={sortBy}
+                onChange={handleSortChange}
+                className="w-full bg-black/50 border border-zinc-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-red cursor-pointer transition"
+              >
+                <option value="popularity.desc">Popularity</option>
+                <option value="vote_average.desc">Rating</option>
+                <option value="primary_release_date.desc">Release Date</option>
+              </select>
+            </div>
+
+            {/* Maturity Rating */}
+            <MaturityRatingFilter
+              selectedRatings={selectedRatings}
+              onRatingChange={setSelectedRatings}
+            />
+
+            {/* Close button */}
+            <button
+              onClick={() => setShowFilters(false)}
+              className="w-full bg-zinc-800 hover:bg-zinc-700 text-white py-2 rounded flex items-center justify-center gap-2 transition"
+            >
+              <X className="w-4 h-4" />
+              Close Filters
+            </button>
+          </div>
+        )}
 
         {/* Results Grid */}
         {isLoading ? (

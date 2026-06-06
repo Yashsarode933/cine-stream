@@ -2,8 +2,10 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from './store/authStore';
+import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 
 // Layout / Pages
+import ErrorBoundary from './components/ui/ErrorBoundary';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -27,6 +29,72 @@ const queryClient = new QueryClient({
   },
 });
 
+// Inner component that uses router-dependent hooks
+const AppRoutes = () => {
+  // Initialize global keyboard navigation (must be inside Router context)
+  useKeyboardNavigation();
+
+  return (
+    <ErrorBoundary>
+      <Routes>
+        {/* Public Authentication / Marketing Routes */}
+        <Route path="/landing" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* Protected Application Routes */}
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <Browse />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/search" 
+          element={
+            <ProtectedRoute>
+              <Search />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/genre/:type/:id" 
+          element={
+            <ProtectedRoute>
+              <Genre />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/mylist" 
+          element={
+            <ProtectedRoute>
+              <MyList />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* 404 Fallback route */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      {/* Global Movie/TV Show Details Modal */}
+      <DetailModal />
+    </ErrorBoundary>
+  );
+};
+
+// Main App component
 function App() {
   const checkAuth = useAuthStore((state) => state.checkAuth);
 
@@ -38,60 +106,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Routes>
-          {/* Public Authentication / Marketing Routes */}
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
-          {/* Protected Application Routes */}
-          <Route 
-            path="/" 
-            element={
-              <ProtectedRoute>
-                <Browse />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/search" 
-            element={
-              <ProtectedRoute>
-                <Search />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/genre/:type/:id" 
-            element={
-              <ProtectedRoute>
-                <Genre />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/mylist" 
-            element={
-              <ProtectedRoute>
-                <MyList />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/profile" 
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } 
-          />
-
-          {/* 404 Fallback route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-
-        {/* Global Movie/TV Show Details Modal */}
-        <DetailModal />
+        <AppRoutes />
       </BrowserRouter>
     </QueryClientProvider>
   );
