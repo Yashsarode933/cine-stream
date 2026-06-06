@@ -14,6 +14,8 @@ import {
   searchMulti,
   getGenres,
   discoverContent,
+  getPersonDetails,
+  getPersonCredits,
 } from '../controllers/tmdbController.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 
@@ -45,5 +47,9 @@ router.get('/discover', cacheMiddleware(1800), discoverContent);
 
 // Search is real-time (no caching)
 router.get('/search', searchMulti);
+
+// Person/Actor routes (1 hour cache)
+router.get('/person/:id', cacheMiddleware(3600), getPersonDetails);
+router.get('/person/:id/credits', cacheMiddleware(3600), getPersonCredits);
 
 export default router;

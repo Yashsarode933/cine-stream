@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Search, Bell, ChevronDown, LogOut, User as UserIcon, Settings } from 'lucide-react';
+import { Search, ChevronDown, LogOut, User as UserIcon, Settings } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useUiStore } from '../../store/uiStore';
+import NotificationPanel from '../ui/NotificationPanel';
 
 const avatars = {
   avatar1: 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png',
@@ -144,11 +145,8 @@ const Navbar = () => {
           />
         </div>
 
-        {/* Notifications Icon (Mock) */}
-        <button className="text-white hover:opacity-85 relative">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-brand-red rounded-full animate-ping"></span>
-        </button>
+        {/* Notifications Panel */}
+        <NotificationPanel />
 
         {/* Profile Dropdown */}
         <div className="relative" ref={dropdownRef}>

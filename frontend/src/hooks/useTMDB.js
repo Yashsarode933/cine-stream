@@ -76,6 +76,16 @@ const discoverContent = async ({ genre, type, sort, page }) => {
   return data.results || [];
 };
 
+const getPersonDetails = async (id) => {
+  const { data } = await axiosInstance.get(`/tmdb/person/${id}`);
+  return data;
+};
+
+const getPersonCredits = async (id) => {
+  const { data } = await axiosInstance.get(`/tmdb/person/${id}/credits`);
+  return data;
+};
+
 // React Query hooks wrapper
 export const useTrendingQuery = () => useQuery({ queryKey: ['trending'], queryFn: getTrending });
 
@@ -150,4 +160,17 @@ export const useDiscoverQuery = ({ genre, type, sort, page }) => useQuery({
   queryKey: ['discover', { genre, type, sort, page }],
   queryFn: () => discoverContent({ genre, type, sort, page }),
   keepPreviousData: true,
+});
+
+// Person/Actor queries
+export const usePersonDetailsQuery = (id) => useQuery({
+  queryKey: ['personDetails', id],
+  queryFn: () => getPersonDetails(id),
+  enabled: !!id,
+});
+
+export const usePersonCreditsQuery = (id) => useQuery({
+  queryKey: ['personCredits', id],
+  queryFn: () => getPersonCredits(id),
+  enabled: !!id,
 });

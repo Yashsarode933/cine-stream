@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Plus, Check, ThumbsUp, ThumbsDown, ChevronDown } from 'lucide-react';
+import { Play, Plus, Check, ThumbsUp, ThumbsDown, ChevronDown, Share2 } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 import { useUserActions } from '../../hooks/useUserActions';
 import axiosInstance from '../../api/axios';
+import ShareButton from '../ui/ShareButton';
 
 const MovieCard = ({
   item,
@@ -179,51 +180,59 @@ const MovieCard = ({
           {/* Body Content */}
           <div className="p-3.5 space-y-2.5">
             {/* Action Buttons Row */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); openDetailModal(item, type); }}
+                    className="bg-white hover:bg-white/80 text-black rounded-full p-1.5 flex items-center justify-center transition"
+                    aria-label="Play"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                  </button>
+
+                  <button
+                    onClick={handleWatchlistToggle}
+                    className="border border-gray-400 hover:border-white text-white rounded-full p-1.5 flex items-center justify-center transition hover:bg-white/10"
+                    aria-label="Toggle Watchlist"
+                  >
+                    {isAddedToWatchlist ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Plus className="w-3.5 h-3.5" />}
+                  </button>
+
+                  <button
+                    onClick={(e) => handleRatingClick(e, 'like')}
+                    className={`border rounded-full p-1.5 flex items-center justify-center transition hover:bg-white/10 ${activeRating === 'like' ? 'border-brand-red text-brand-red bg-brand-red/5' : 'border-gray-400 text-white'
+                      }`}
+                    aria-label="Like"
+                  >
+                    <ThumbsUp className="w-3.5 h-3.5" />
+                  </button>
+
+                  <button
+                    onClick={(e) => handleRatingClick(e, 'dislike')}
+                    className={`border rounded-full p-1.5 flex items-center justify-center transition hover:bg-white/10 ${activeRating === 'dislike' ? 'border-brand-red text-brand-red bg-brand-red/5' : 'border-gray-400 text-white'
+                      }`}
+                    aria-label="Dislike"
+                  >
+                    <ThumbsDown className="w-3.5 h-3.5" />
+                  </button>
+
+                  {/* Share Button */}
+                  <ShareButton
+                    title={title}
+                    description={item.overview || ''}
+                    mediaType={type}
+                    itemId={itemId}
+                  />
+                </div>
+
                 <button
                   onClick={(e) => { e.stopPropagation(); openDetailModal(item, type); }}
-                  className="bg-white hover:bg-white/80 text-black rounded-full p-1.5 flex items-center justify-center transition"
-                  aria-label="Play"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                </button>
-
-                <button
-                  onClick={handleWatchlistToggle}
                   className="border border-gray-400 hover:border-white text-white rounded-full p-1.5 flex items-center justify-center transition hover:bg-white/10"
-                  aria-label="Toggle Watchlist"
+                  aria-label="Show Details"
                 >
-                  {isAddedToWatchlist ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Plus className="w-3.5 h-3.5" />}
-                </button>
-
-                <button
-                  onClick={(e) => handleRatingClick(e, 'like')}
-                  className={`border rounded-full p-1.5 flex items-center justify-center transition hover:bg-white/10 ${activeRating === 'like' ? 'border-brand-red text-brand-red bg-brand-red/5' : 'border-gray-400 text-white'
-                    }`}
-                  aria-label="Like"
-                >
-                  <ThumbsUp className="w-3.5 h-3.5" />
-                </button>
-
-                <button
-                  onClick={(e) => handleRatingClick(e, 'dislike')}
-                  className={`border rounded-full p-1.5 flex items-center justify-center transition hover:bg-white/10 ${activeRating === 'dislike' ? 'border-brand-red text-brand-red bg-brand-red/5' : 'border-gray-400 text-white'
-                    }`}
-                  aria-label="Dislike"
-                >
-                  <ThumbsDown className="w-3.5 h-3.5" />
+                  <ChevronDown className="w-3.5 h-3.5" />
                 </button>
               </div>
-
-              <button
-                onClick={(e) => { e.stopPropagation(); openDetailModal(item, type); }}
-                className="border border-gray-400 hover:border-white text-white rounded-full p-1.5 flex items-center justify-center transition hover:bg-white/10"
-                aria-label="Show Details"
-              >
-                <ChevronDown className="w-3.5 h-3.5" />
-              </button>
-            </div>
 
             {/* Quick Metadata */}
             <div className="space-y-0.5">

@@ -333,3 +333,60 @@ export const discoverContent = async (req, res) => {
   }
 };
 
+// @desc    Get Person/Actor Details
+// @route   GET /api/tmdb/person/:id
+export const getPersonDetails = async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (isMockMode()) {
+      // Mock person data
+      return res.json({
+        id: Number(id),
+        name: 'Mock Actor',
+        biography: 'This is a mock biography for the actor. In a real implementation, this would contain detailed information about the actor\'s life and career.',
+        birthday: '1980-01-15',
+        deathday: null,
+        gender: 2,
+        known_for_department: 'Acting',
+        place_of_birth: 'Los Angeles, California, USA',
+        popularity: 15.5,
+        profile_path: null,
+        also_known_as: ['Mock Actor', 'M. Actor'],
+        imdb_id: 'nm0000001',
+        homepage: null,
+      });
+    }
+    const data = await fetchFromTMDB(`/person/${id}`);
+    return res.json(data);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get Person/Actor Credits (filmography)
+// @route   GET /api/tmdb/person/:id/credits
+export const getPersonCredits = async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (isMockMode()) {
+      // Mock credits data
+      return res.json({
+        cast: mockItems.slice(0, 8).map(item => ({
+          ...item,
+          character: 'Main Character',
+          order: Math.floor(Math.random() * 10),
+        })),
+        crew: mockItems.slice(0, 3).map(item => ({
+          ...item,
+          job: 'Producer',
+          department: 'Production',
+        })),
+      });
+    }
+    const data = await fetchFromTMDB(`/person/${id}/combined_credits`);
+    return res.json(data);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+

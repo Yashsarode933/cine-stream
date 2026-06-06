@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Plus, Check, Volume2, VolumeX, ThumbsUp, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { X, Play, Plus, Check, Volume2, VolumeX, ThumbsUp, Star, Share2 } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 import { useUserActions } from '../../hooks/useUserActions';
+import ShareButton from '../ui/ShareButton';
 import {
   useMovieDetailsQuery,
   useTVDetailsQuery,
@@ -18,6 +20,7 @@ const DetailModal = () => {
   const { activeModalItem, activeModalType, closeDetailModal } = useUiStore();
   const [isMuted, setIsMuted] = useState(true);
   const [trailerKey, setTrailerKey] = useState('');
+  const navigate = useNavigate();
 
   const itemId = activeModalItem?.id;
   const isMovie = activeModalType === 'movie';
@@ -179,6 +182,14 @@ const DetailModal = () => {
                 >
                   {isAddedToWatchlist ? <Check className="w-5 h-5 text-green-500" /> : <Plus className="w-5 h-5" />}
                 </button>
+
+                {/* Share Button */}
+                <ShareButton
+                  title={title}
+                  description={details?.overview || activeModalItem.overview || ''}
+                  mediaType={activeModalType}
+                  itemId={itemId}
+                />
               </div>
 
               {trailerKey && (
@@ -260,15 +271,22 @@ const DetailModal = () => {
                       ? (actor.profile_path.startsWith('http') ? actor.profile_path : `https://image.tmdb.org/t/p/w185${actor.profile_path}`)
                       : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop';
                     return (
-                      <div key={actor.id} className="flex-shrink-0 w-24 text-center space-y-1">
+                      <button
+                        key={actor.id}
+                        onClick={() => {
+                          closeDetailModal();
+                          navigate(`/actor/${actor.id}`);
+                        }}
+                        className="flex-shrink-0 w-24 text-center space-y-1 group cursor-pointer"
+                      >
                         <img 
                           src={picUrl} 
                           alt={actor.name} 
-                          className="w-16 h-16 rounded-full object-cover mx-auto border border-white/10"
+                          className="w-16 h-16 rounded-full object-cover mx-auto border border-white/10 group-hover:border-brand-red transition-colors"
                         />
-                        <p className="text-xs font-bold text-gray-200 truncate">{actor.name}</p>
+                        <p className="text-xs font-bold text-gray-200 truncate group-hover:text-brand-red transition-colors">{actor.name}</p>
                         <p className="text-[10px] text-gray-400 truncate">{actor.character}</p>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>

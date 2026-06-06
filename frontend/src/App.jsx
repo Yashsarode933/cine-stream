@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import Browse from './pages/Browse';
 import Search from './pages/Search';
 import Genre from './pages/Genre';
+import Actor from './pages/Actor';
 import MyList from './pages/MyList';
 import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
@@ -64,6 +65,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <Genre />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/actor/:id" 
+          element={
+            <ProtectedRoute>
+              <Actor />
             </ProtectedRoute>
           } 
         />
